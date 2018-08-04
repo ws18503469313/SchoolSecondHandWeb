@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns:aop="http://www.springframework.org/schema/aop"
+     xmlns:tx="http://www.springframework.org/schema/tx"
+     xmlns:context="http://www.springframework.org/schema/context"
+     xsi:schemaLocation="
+     http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/tx
+     http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+     http://www.springframework.org/schema/aop 
+     http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+     http://www.springframework.org/schema/context
+   	 http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+  
+   
+  
+  <!-- 打开Spring的Annotation -->
+  <context:annotation-config/>
+  
+  <!-- 到那些包找类 -->
+  <context:component-scan base-package="com.ws"/>
+  	
+  <!-- 创建数据库连接 -->
+  	<!-- 导入数据库文件properties -->
+  	<context:property-placeholder location="classpath:db.properties"/>
+  	
+  	<!-- 创建数据库的数据源 -->
+  	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${driver}"/>
+		<property name="url" value="${url}"/>
+		<property name="username" value="${username}"/>
+		<property name="password" value="${password}"/>
+		
+		<!-- 初始化连接大小 -->  
+        <property name="initialSize" value="${jdbc.initialSize}"></property>  
+        <!-- 连接池最大数量 -->  
+        <property name="maxActive" value="${jdbc.maxActive}"></property>  
+        <!-- 连接池最大空闲 -->  
+        <property name="maxIdle" value="${jdbc.maxIdle}"></property>  
+        <!-- 连接池最小空闲 -->  
+        <property name="minIdle" value="${jdbc.minIdle}"></property>  
+        <!-- 获取连接最大等待时间 -->  
+        <property name="maxWait" value="${jdbc.maxWait}"></property>
+	</bean> 
+	
+	
+  
+  	<!-- 配置SessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<!-- 注入数据源 -->
+		<property name="dataSource" ref="dataSource" />
+		<!-- 设置Sping扫描实体类 -->
+		<property name="packagesToScan" >
+   	 		<value>com.ws.entity</value>
+   	 	</property>
+   	 	<!-- 数据库(HIBERNATE)的配置 -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				
+ 				<prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext</prop>
+ 				
+				<prop key="hibernate.cache.use_second_level_cache">true</prop>
+				<prop key="hibernate.cache.use_query_cache">true</prop>
+				<prop key="hibernate.cache.provider_class">net.sf.ehcache.hibernate.EhCacheProvider</prop>
+				<prop key="hibernate.cache.region.factory_class">
+					org.hibernate.cache.ehcache.EhCacheRegionFactory
+				</prop>
+				<prop key="hibernate.cache.provider_configuration_file_resource_path">ehcache.xml</prop>
+			</props>
+		</property>
+		
+	</bean>
+  	
+  
+  	<!-- AOP创建事务管路器 开始-->
+   	  <bean id="txManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+   	 	<property name="sessionFactory" ref="sessionFactory"></property>
+   	 </bean>
+   <!-- 	 配置aop -->
+   	 <aop:config><!-- execution(* com.ifm.mvc.annotation.service..*Service.*(..)) -->
+   	 	<aop:pointcut expression="execution(* com.ws.service.impl.*.*(..))" id="allMethod"/>
+   	 	<aop:advisor advice-ref="txAdvice" pointcut-ref="allMethod"/>
+   	 </aop:config>
+   	<!--  哪些方法添加事务 -->
+   	 <tx:advice id="txAdvice" transaction-manager="txManager">
+   	 	<tx:attributes>
+   	 		<tx:method name="*" propagation="REQUIRED" read-only="false" />
+   	 		<tx:method name="add*" propagation="REQUIRED" />
+   	 		<tx:method name="delete*" propagation="REQUIRED" />
+   	 		<tx:method name="update" propagation="REQUIRED" />
+   	 	</tx:attributes>
+   	 </tx:advice> 
+  	<!-- 创建事务管路器结束 -->
+  	<!-- ********************************加入日志开始****************************** -->
+  	
+  	<bean id="AopLogger" class="com.ws.aop.AopLogger"></bean>
+  	
+  	<aop:config>  
+	<!--定义切面-->  
+	    <aop:aspect  ref="AopLogger">  
+	    <!-- 定义切入点 (配置在com.gray.user.controller下所有的类在调用之前都会被拦截)-->  
+	    <aop:pointcut expression="execution(* com.ws.service.impl.*.*(..)) " id="logPointCut"/>  
+	    <!--方法执行之前被调用执行的-->  
+	    <!-- <aop:before method="before" pointcut-ref="logPointCut"/> --><!--一个切入点的引用-->  
+	    <aop:after method="after" pointcut-ref="logPointCut"/><!--一个切入点的引用-->  
+	    </aop:aspect>  
+	</aop:config>  
+	<!-- ********************************加入日志结束****************************** -->
+  	
+ </beans>

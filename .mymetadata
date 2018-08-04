@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="SchoolSecondHandWeb"
+  id="myeclipse.1519966213884"
+  context-root="/SchoolSecondHandWeb"
+  j2ee-spec="5.0"
+  archive="SchoolSecondHandWeb.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

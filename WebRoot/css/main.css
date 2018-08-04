@@ -1,0 +1,42 @@
+*{
+	margin: 0px;padding: 0px;
+}
+a:HOVER{color: green; text-decoration: none;}
+a:VISITED {color: blue;}
+a:LINK{color: purple;text-decoration: none;}
+
+.type{
+	position: relative;height: 180px;	
+}
+.type ul{
+	text-align: center;clear: right;line-height: 180px;margin-left: 400px;text-decoration:none;
+}
+.type ul li{
+	float:left; font-size: 26px;font-weight: 300; font-family: "楷体";
+	margin-left:15px;text-decoration:none;
+}
+.type ul li a{
+		
+}
+.type .search{
+	height: 100px;width: 400px;margin-left:400px;margin-top:15px;
+}
+.type .search input{
+	height: 45px;width: 300px;font-size: 28px;font-weight: bold;margin-top: 5px;border: 1.5px solid;color: gray;
+}
+.type .search .search_btn{
+	width: 50px;height: 50px;font-weight: bold;	line-height: 50px;
+}
+.message{
+	position:absolute;top:70px;
+	border: 1px solid green;
+	width: 300px;height: 500px;
+}
+.message table{
+	width: 300px;height: 500px;font-size: 18px;
+}
+.message table .title{
+	font-size: 24px;font-weight: bold;text-align: center;
+}
+
+
